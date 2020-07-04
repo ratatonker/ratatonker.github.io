@@ -1,0 +1,15 @@
+{
+  "name": "ratcalc",
+  "version": "1.0.0",
+  "description": "rat stats baby",
+  "main": "index.js",
+  "scripts": {
+    "run": "node --expose-gc --max_old_space_size=4096 .",
+    "test": "nodemon . --expose-gc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vue": "^2.6.11"
+  }
+}

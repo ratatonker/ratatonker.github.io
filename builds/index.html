@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ratatonker calc</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/minty/bootstrap.min.css">
+</head>
+
+<body>
+    <nav class="navbar sticky-top navbar-expand-sm navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">rat-stats.pizza</a>
+
+        <ul class="nav justify-content-center nav-pills">
+            <li class="nav-item">
+                <a class="nav-link" href="/">home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white active" href="/builds">saved builds</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">faq</a>
+            </li>
+        </ul>
+
+    </nav>
+
+    <br>
+
+    <div id="app" class="container">
+        <p v-if="rat_list.length == 0"> builds list empty! go and <a href="/">add some!</a></p>
+        <div class="row">
+
+            <div v-for="(rat, i) in rat_list">
+                <div class="card bg-light border-warning mb-3" style="padding: 1em">
+                    <div class="row-flex">
+                        <div class="col-xs-1-12">
+                            <h3><button v-on:click="remove(rat)" class="btn btn-danger">Remove
+                                    Build</button> stats</h3>
+                            <h4>effective hp:
+                                <span class="text-danger">
+                                    {{rat.effective_hp.phys}}
+                                </span>
+                                <span class="text-info">
+                                    {{rat.effective_hp.magic}}
+                                </span>
+                            </h4>
+                            <table class="table table-striped table-inverse table-responsive">
+                                <thead class="thead-inverse">
+                                    <tr>
+                                        <th>power</th>
+                                        <th>pen</th>
+                                        <th>%pen</th>
+                                        <th>vamp%</th>
+                                        <th>crit%</th>
+                                        <th>atk spd%</th>
+                                        <th>speed%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td scope="row">{{rat.stats.pwr}}</td>
+                                        <td>{{rat.stats.pen}}</td>
+                                        <td>{{rat.stats.pencent}}</td>
+                                        <td>{{rat.stats.vamp}}</td>
+                                        <td>{{rat.stats.crit}}</td>
+                                        <td>{{rat.stats.atk}}</td>
+                                        <td>{{rat.stats.speed}}</td>
+                                    </tr>
+                                </tbody>
+                                <thead class="thead-inverse">
+                                    <tr>
+                                        <th>def</th>
+                                        <th>mdf</th>
+                                        <th>mitigation%</th>
+                                        <th>hp</th>
+                                        <th>mana</th>
+                                        <th>cdr%</th>
+                                        <th>ccr%</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td scope="row">{{rat.stats.def}}</td>
+                                        <td>{{rat.stats.mdf}}</td>
+                                        <td>{{rat.stats.mit}}</td>
+                                        <td>{{rat.stats.hp}}</td>
+                                        <td>{{rat.stats.mana}}</td>
+                                        <td>{{rat.stats.cdr}}</td>
+                                        <td>{{rat.stats.ccr}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <h3> items </h3> <br>
+                    <div class="row">
+
+                        <div v-for="item in rat.items" class="card text-white bg-primary mb-3"
+                            style="max-width: 20rem; margin: 0.5em">
+                            <div class="card-header">{{item.name}}</div>
+                            <div class="card-body">
+                                <span v-for="(st, nm) in item.stats">
+                                    <strong class="text-secondary">{{nm}}: </strong>{{st}}
+                                </span>
+
+                                <p class="card-text">
+                                    passive: {{item.passive}}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>

@@ -1,3 +1,8 @@
+
+Vue.use(VueApexCharts)
+
+Vue.component('apexchart', VueApexCharts)
+
 var app = new Vue({
     el: '#app',
     data: {

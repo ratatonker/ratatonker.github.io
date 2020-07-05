@@ -7,10 +7,12 @@
     <title>ratatonker calc</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/minty/bootstrap.min.css">
 </head>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-apexcharts"></script>
 
 <body>
     <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">rat-stats.pizza</a>
+        <a class="navbar-brand" href="/">statatonker</a>
 
         <ul class="nav justify-content-center nav-pills">
             <li class="nav-item">
@@ -47,27 +49,55 @@
                             <div class="custom-control custom-switch">
                                 <input v-model.boolean="use_acorns" type="checkbox" class="custom-control-input"
                                     id="customSwitch2">
-                                <label class="custom-control-label" for="customSwitch2">Include Acorns?</label>
+                                <label class="custom-control-label" for="customSwitch2">Ban Lonos Mask?</label>
+                            </div>
+                            <div class="custom-control custom-switch">
+                                <input v-model.boolean="lonos" type="checkbox" class="custom-control-input"
+                                    id="customSwitch3">
+                                <label class="custom-control-label" for="customSwitch3">Include Acorns?</label>
                             </div>
                             Disabling this generates 6 non-acorn items, in case for some reason you aren't playing
-                            rat.
+                            rat. <br> <br>
+                            enemy armor: {{enemy_armor}}
+                            <input v-model.number="enemy_armor" type="range" v-bind:class="{'disabled': !random}"
+                                class="custom-range" max="325"> </input>
                         </div>
                         <div class="col">
                             <div class="btn-primary btn-lg btn-block"> stat spread priority</div><br>
                             power: {{power}} <input v-model.number="power" v-bind:class="{'disabled': !random}"
-                                type="range" class="custom-range"> </input>
+                                type="range" class="custom-range" max="10"> </input>
                             def: {{def}} <input v-model.number="def" type="range" v-bind:class="{'disabled': !random}"
-                                class="custom-range"> </input>
+                                class="custom-range" max="10"> </input>
                             mdf: {{mdf}} <input v-model.number="mdf" type="range" v-bind:class="{'disabled': !random}"
-                                class="custom-range"> </input>
+                                class="custom-range" max="10"> </input>
                             util: {{util}} <input v-model.number="util" type="range"
-                                v-bind:class="{'disabled': !random}" class="custom-range"> </input>
+                                v-bind:class="{'disabled': !random}" class="custom-range" max="10"> </input>
                         </div>
                     </div>
 
                 </form>
+                <div class="row">
+                    <div class="btn-primary btn-lg btn-block"> manual item entry</div>
+                    <br>
+                    <div v-for="(selection, index) in preselect">
+                        <br>
+
+                        <div class="form-group">
+
+                            <select v-model="preselect[index]" class="custom-select" name="" id="">
+                                <option selected="">auto</option>
+                                <option v-for="choice in itemdata">
+                                    {{choice.name ? choice.name : auto}}<span style="width: 1em"></span>
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <br> <br>
+
                 <p class="lead">
-                    <a v-on:click="search" class="btn btn-primary btn-md" href="#" role="button">Generate Builds</a>
+                    <a v-on:click="search" class="btn btn-secondary btn-md" href="#" role="button">Generate Builds</a>
                 </p>
                 <p>
                     please be patient :) there are ~28M item combos to calc.... `s` (progress is logged in JS console)
@@ -81,13 +111,22 @@
 
         </div>
 
+        <div v-if="alert" class="alert alert-success alert-dismissible fade show" role="alert">
+            <button v-on:click="alert = false" type="button" class="close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Generating done!</strong>
+        </div>
+
         <div class="row">
 
             <div v-for="(rat, i) in rat_list">
-                <div class="card bg-light border-warning mb-3 " style="padding: 1em">
-                    <div class="row">
+
+                <div class="card bg-light mb-2 " style="padding: 2em">
+                    <div class="row justify-content-md-center">
                         <div class="col-xs-1-12">
                             <h3> stats</h3>
+                            <h3><strong>score: </strong>{{rat.score}}</h3>
                             <h4> effective hp:
                                 <span class="text-danger">
                                     {{rat.effective_hp.phys}}
@@ -143,6 +182,11 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="col-xs-1-12" style="padding-top: 9%">
+                            <apexchart width="500" type="radar" :options="rat.chart.options" :series="rat.chart.series">
+                            </apexchart>
+                        </div>
+
                     </div>
                     <h3> <button v-on:click="save(rat)" class="btn btn-success">Save Build</button> items </h3> <br>
                     <div class="row flex-fill">
@@ -167,7 +211,12 @@
         </div>
     </div>
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>

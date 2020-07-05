@@ -4,8 +4,8 @@ function effective_hp(stats) {
     var armor = 100 / (100 + stats.def)
     var magic = 100 / (100 + stats.mdf)
     return ({
-        phys: Math.round(stats.hp / ((stats.mit * 0.1) + armor)),
-        magic: Math.round(stats.hp / ((stats.mit * 0.1) + magic))
+        phys: Math.round((stats.hp) / (armor * (1 - (stats.mit / 100)))),
+        magic: Math.round((stats.hp) / (magic * (1 - (stats.mit / 100))))
     })
 }
 
@@ -29,7 +29,8 @@ function getRat() {
             speed: 0
         },
         itemnames: [],
-        items: []
+        items: [],
+        score: 0
     }
 
     return rat
@@ -357,8 +358,7 @@ items = [
             def: 40,
             mdf: 40,
             cdr: 10,
-            ccr: 20,
-            mit: 15
+            ccr: 20
         },
         passive: 'You gain an additional 15% Damage Mitigation for 3s whenever you are hit with a hard Crowd Control Effect. This can only occur once every 15 seconds.',
         stat_calc: function (stats) {
@@ -547,7 +547,7 @@ items = [
     }, {
         name: 'Ichaival',
         stats: {
-            pwr: 75,
+            pwr: 30,
             atk: 30
         },
         passive: 'Every successful Basic Attack increases your Physical Power by 15 and reduces the attack speed of your opponent by 10% for 3s',
@@ -742,7 +742,14 @@ items = [
     },
 ]
 
+function itemSort(a, b) {
+    return (a.name > b.name)
+}
+
+items.sort((a, b) => (a.name > b.name) - (a.name < b.name))
+console.log(items)
 function getItem(n) {
+    if (n == null) { return null }
     out = null
     items.forEach(function (i) {
         if (i.name.trim().localeCompare(n.trim()) == 0) {
@@ -753,23 +760,30 @@ function getItem(n) {
     return (out)
 }
 
+Vue.use(VueApexCharts)
 
-
+Vue.component('apexchart', VueApexCharts)
 
 
 var app = new Vue({
     el: "#app",
     data: {
+        alert: false,
         rat_list: [],
         saved: [],
+        charts: [],
+        preselect: ['auto', 'auto', 'auto', 'auto', 'auto'],
+        itemdata: items,
         random: false,
         use_acorns: true,
+        lonos: true,
+        enemy_armor: 100,
         percent: 0,
         number: 6,
-        power: 0,
-        def: 0,
-        mdf: 0,
-        util: 0
+        power: 5,
+        def: 5,
+        mdf: 5,
+        util: 5
     },
     methods: {
         save: function (rat, event) {
@@ -794,6 +808,21 @@ var app = new Vue({
 
         },
         search: function (event) {
+            console.log(this.preselect)
+            preset_items = []
+            this.preselect.forEach(element => {
+                if (getItem(element)) {
+                    preset_items.push(getItem(element))
+                }
+            })
+            console.log(preset_items)
+
+            adjusted_items = items
+            adjusted_items = adjusted_items.filter((el) => !preset_items.includes(el))
+
+            if (this.lonos) {
+                adjusted_items = adjusted_items.filter((el) => ![getItem('Lonos Mask')].includes(el))
+            }
 
             let rat_limit = this.number
             def = this.def
@@ -801,19 +830,48 @@ var app = new Vue({
             power = this.power
             util = this.util
             random = this.random
+            enemy_armor = this.enemy_armor
 
             sort_criteria = function (a, b) {
                 if (this.random) {
                     return (Math.random() - 0.9999993)
                 }
+
                 a_ehp = effective_hp(a.stats)
                 a_avg = (a_ehp.phys + a_ehp.magic) / 2
                 b_ehp = effective_hp(b.stats)
                 b_avg = (b_ehp.phys + b_ehp.magic) / 2
 
-                a_ = (a_ehp.phys / 10) * this.def + (a_ehp.magic / 10) * this.mdf + a.stats.pwr * this.power + a.stats.cdr * this.util
-                b_ = (b_ehp.phys / 10) * this.def + (b_ehp.magic / 10) * this.mdf + b.stats.pwr * this.power + b.stats.cdr * this.util
-                return (a_ - b_)
+                a_phys = (a_ehp.phys * 0.00485)
+                b_phys = (b_ehp.phys) * 0.00485
+                a_magic = (a_ehp.magic) * 0.00485
+                b_magic = (b_ehp.magic) * 0.00485
+
+                cap_power = Math.min(400, a.stats.pwr)
+                cap_percent = Math.min(40, a.stats.pencent)
+                cap_pen = Math.min(50, a.stats.pen)
+                cap_crit = Math.min(100, a.stats.crit)
+
+                enemy_mit = (100 / (100 + Math.max(0, (this.enemy_armor * (1 - cap_percent * 0.01) - cap_pen))))
+                a_power = (cap_power / 4) + (cap_power / 4) * cap_crit * 0.01
+                a_power = a_power * enemy_mit
+
+                a.score = Math.round((a_phys * this.def + a_magic * this.mdf + a_power * this.power) / (1 + this.def + this.mdf + this.power))
+
+                if (!b.score) {
+
+                    cap_power = Math.min(400, b.stats.pwr)
+                    cap_percent = Math.min(40, b.stats.pencent)
+                    cap_pen = Math.min(50, b.stats.pen)
+                    cap_crit = Math.min(100, b.stats.crit)
+
+                    enemy_mit = (100 / (100 + Math.max(0, (this.enemy_armor * (1 - cap_percent * 0.01) - cap_pen))))
+                    b_power = (cap_power / 4) + (cap_power / 4) * cap_crit * 0.01
+                    b_power = b_power * enemy_mit
+                    b.score = Math.round((b_phys * this.def + b_magic * this.mdf + b_power * this.power) / (1 + this.def + this.mdf + this.power))
+                }
+
+                return (a.score - b.score)
             }
 
             console.clear()
@@ -828,7 +886,7 @@ var app = new Vue({
             if (!this.use_acorns) { item_len = 6 }
             console.log(item_len)
 
-            working_items = subsets(new Set(items), item_len)
+            working_items = subsets(new Set(adjusted_items), item_len - preset_items.length)
             for (var set of working_items) {
 
                 acorns.forEach(function (acorn) {
@@ -836,6 +894,9 @@ var app = new Vue({
                     if (this.use_acorns) {
                         rat.items.push(acorn)
                     }
+                    preset_items.forEach(element => {
+                        rat.items.push(element)
+                    })
                     for (var e of set) {
                         rat.items.push(e)
                     }
@@ -884,7 +945,6 @@ var app = new Vue({
                     console.clear()
                     console.log('permutations: ' + Math.round(count / 1000000) + 'M')
                     this.percent = Math.round(100 - (((28000000 - count) / 28000000) * 100))
-                    $('#prog').css('width', this.percent + '%')
                 }
             }
 
@@ -895,8 +955,51 @@ var app = new Vue({
             rats.reverse()
             console.log(rats)
             console.log(rats.length)
+            rats.forEach((r) => {
+                r.chart = {
+                    options: {
+                        dropShadow: {
+                            enabled: true,
+                            top: 0,
+                            left: 0,
+                            blur: 3,
+                            opacity: 0.5
+                        },
+                        fill: {
+                            opacity: 0.5,
+                            colors: ['#F3969A']
+                        },
+                        stroke: {
+                            show: true,
+                            width: 2,
+                            colors: ['#F3969A'],
+                            dashArray: 0
+                        },
+                        markers: {
+                            size: 3,
+                            colors: ['#F3969A'],
+                        },
+                        chart: {
+                            id: r.score,
+                            toolbar: {
+                                show: true,
+                            }
+                        },
+                        xaxis: {
+                            categories: ['pwr', 'def', 'mdf', 'crit', 'vamp', 'pen']
+                        }
+                    },
+                    series: [{
+                        name: '',
+                        color: '#F3969A',
+                        data: [r.stats.pwr, r.stats.def, r.stats.mdf, r.stats.crit, r.stats.vamp, r.stats.pen + r.stats.pencent]
+                    }]
+                }
+                console.log(r.chart)
+            })
             this.rat_list = rats
             not = new Notification('Rat builds loaded!')
+            this.alert = true
         }
     }
 })

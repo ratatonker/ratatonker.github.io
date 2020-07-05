@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ratatonker calc</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/minty/bootstrap.min.css">
+</head>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-apexcharts"></script>
+
+<body>
+    <nav class="navbar navbar-expand-sm sticky-top navbar-dark bg-dark">
+        <a class="navbar-brand" href="/">statatonker</a>
+
+        <ul class="nav justify-content-center nav-pills">
+            <li class="nav-item">
+                <a class="nav-link  text-white" href="/">home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/builds">saved builds</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="$">faq</a>
+            </li>
+        </ul>
+
+    </nav>
+
+    <br>
+
+    <div id="app" class="container">
+        <div class="jumbotron flex-fill">
+            <h2>
+                why does it take so long to load?
+            </h2>
+            <p>
+                in order to find the most stat-efficient combinations, the algorithm needs to sort through
+                every possible combination (up to 6 items!) while also applying factors like bonus stats from passives
+                (for instance the 3% power -> mana bonus from Transcendance). A faster "greedy" algorithm that only
+                tries to find the best stat items one at a time may not actually produce the most optimal result due to
+                this. i wrote this generator specifically to experiment with the new ratatoskr acorns synergy with other
+                tanky items<br>
+                if you want to speed up your search times, try adding in a few items manually before starting. Each item
+                multiplicatively speeds up the search. the search sorts its results as it operates, only holding onto
+                the amount of results you specify while it works - so it doesn't eat up inane amounts of ram generating
+                every possibility. you can safely set the value to some really high values without a speed impact
+
+                if you want you can <button class="btn-xs btn-link" onclick="Notification.requestPermission()" href="">
+                    enable
+                    notification
+                    access</button>, and
+                the site will ping you when the search is done
+            </p>
+            <h2>
+                does this actually generate 'optimal' builds?
+            </h2>
+            <p>
+                no not really. there are a few notable things about how this generates results:
+            <ul>
+                <li> only passive effects that augment stats are reflected in the data, though it shows passives for
+                    easier reference. So some items which have good utility through their passive will simply be skipped
+                    since the system doesnt really have a way of
+                </li>
+                <li> item stats are imagined in a 'best case' scenario: meaning they are fully stacked and have an
+                    active passive when it meaningfully impacts stats. for instance, stone cutting sword is stored at
+                    having 30 def + 30 pen, though that is not technically an accurate representation of the item
+                </li>
+                <li> so far not every stat is tracked by search as 'useful' even if they would have an impact on
+                    dps/sustain in game. updates should fix this over time and allow for more granularity in the search.
+                    there are some stats that are hard to account for in the search without injecting too much 'opinion'
+                    to the formulas - for example currently the item data does not track hp5/mp5 at all, and lifesteal
+                    will likely be considered as a 'utility' stat in the future
+                </li>
+                <li> there is a bit of correction in place currently for 'stat caps' - mostly relating to dmg output,
+                    though it will show you how much each stat is without the cap when the search is done
+                </li>
+            </ul>
+            </p>
+
+            <h2>
+                what are 'effective hp' and 'relative score'?
+            </h2>
+            <p>
+                your effective hp is a figure representing <strong>how much damage</strong> it would take to kill you,
+                accounting for both your hp and your armors. when sorting for high defense stats, the system uses these
+                rather than the raw protection stats of the items. for example, at 100 armor, you negate 50% of damage
+                taken (of that type) - so if you have 1500 hp, your effective health is 3000. this is why there are two
+                numbers: red(first) is physical, blue(second) is magical. you can read more about
+                damage scaling in the wondrously comprehensive <a
+                    href="https://drive.google.com/file/d/1ow_ls0iB2wi2jbgU1FZv7RWWbqRDBGpt/view">word of thoth</a> for
+                which the formula was derived from
+                <br><br>
+                the 'relative score' of a build does not mean much actually. its simply a value generated for the build
+                while sorting based off the parameters of the search. its not a description of how 'objectively good' a
+                build is or isn't - rather how well it matches the parameters of the search. the same build can have
+                drastically different scores if you provided different search criteria
+
+            </p>
+            <h2>
+                will this site get support for other smite characters?
+            </h2>
+            <p>
+                in a sense the framework for it is already in place - so it could be likely. my plan is to do more work
+                for now on ratatoskr specific models, such as estimating damage from auto-attack chains and abilities,
+                to give a more realistic view of the damage output the character. ratatoskrs new acorns also have the
+                benefit of allowing him to have a faster overall search time, since one item slot only has 4 options. if
+                you are currently using this site to test builds for other physical dmg characters, please note that the
+                stat totals listed <strong>include</strong> the lvl.20 base stats for ratatoskr <br><br>
+                right now the app isnt connected to the smite api database to retrieve item info since the way data is
+                stored is 'opinionated'. so adding support for other characters / classes is largely a matter of the
+                data formatting necessary to get them usable by the algorithm. if you wanna help add more data, or look
+                at my terrible, strenuous sorting system, feel free to reach out on the project <a
+                    href="https://github.com/ratatonker/ratatonker.github.io">github</a>
+
+            </p>
+        </div>
+    </div>
+
+</body>
+
+</html>

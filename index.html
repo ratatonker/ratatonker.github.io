@@ -22,7 +22,7 @@
                 <a class="nav-link text-white" href="/builds">saved builds</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" href="#">faq</a>
+                <a class="nav-link text-white" href="/faq">faq</a>
             </li>
         </ul>
 
@@ -100,7 +100,8 @@
                     <a v-on:click="search" class="btn btn-secondary btn-md" href="#" role="button">Generate Builds</a>
                 </p>
                 <p>
-                    please be patient :) there are ~28M item combos to calc.... `s` (progress is logged in JS console)
+                    please be patient :) there are ~28M item combos to calc.... `s`, less if you manually add items
+                    above (progress is logged in JS console)
                 </p>
                 <div class="progress">
                     <div id="prog" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
@@ -126,7 +127,7 @@
                     <div class="row justify-content-md-center">
                         <div class="col-xs-1-12">
                             <h3> stats</h3>
-                            <h3><strong>score: </strong>{{rat.score}}</h3>
+                            <h3><strong>relative score: </strong>{{rat.score}}</h3>
                             <h4> effective hp:
                                 <span class="text-danger">
                                     {{rat.effective_hp.phys}}
@@ -188,7 +189,9 @@
                         </div>
 
                     </div>
-                    <h3> <button v-on:click="save(rat)" class="btn btn-success">Save Build</button> items </h3> <br>
+                    <h3> <button v-on:click="save(rat)" class="btn btn-success">Save
+                            Build</button> items </h3> <br>
+                    <p v-if="saved.indexOf(rat) >= 0">saved</p>
                     <div class="row flex-fill">
 
                         <div v-for="item in rat.items" class="card text-white bg-primary mb-3"

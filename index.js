@@ -694,7 +694,7 @@ items = [
         stat_calc: function (stats) {
             attack_speed = stats.base_atk + (stats.base_atk * (stats.atk / 100))
             if (attack_speed > 2.5) {
-                stats.pwr += (attack_speed - 2.5) / 0.02
+                stats.pwr += Math.round((attack_speed - 2.5) / 0.02)
             }
         }
     }, {
@@ -850,10 +850,10 @@ var app = new Vue({
                 b_ehp = effective_hp(b.stats)
                 b_avg = (b_ehp.phys + b_ehp.magic) / 2
 
-                a_phys = (a_ehp.phys * 0.00485)
-                b_phys = (b_ehp.phys) * 0.00485
-                a_magic = (a_ehp.magic) * 0.00485
-                b_magic = (b_ehp.magic) * 0.00485
+                a_phys = (a_ehp.phys * 0.005)
+                b_phys = (b_ehp.phys) * 0.005
+                a_magic = (a_ehp.magic) * 0.005
+                b_magic = (b_ehp.magic) * 0.005
 
                 cap_power = Math.min(pwr_cap, a.stats.pwr)
                 cap_percent = Math.min(40, a.stats.pencent)

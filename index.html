@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ratatonker calc</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/minty/bootstrap.min.css">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="https://statatonker.github.io">
+    <meta name="twitter:title" content="statatonker">
+    <meta name="twitter:description" content="stat simulator / optimized build generator for ratatoskr">
 </head>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue-apexcharts"></script>
@@ -107,11 +111,12 @@
                     <a v-on:click="search" class="btn btn-secondary btn-md" href="#" role="button">Generate Builds</a>
                 </p>
                 <p>
-                    please be patient :) there are ~28M item combos to calc.... `s`, less if you manually add items
-                    above (progress is logged in JS console)<br>
+                    please be patient :) there are ~28M item combos to calc.... `s`, adding items above speeds up the
+                    search dramatically (progress is logged in JS console)<br>
                     mobile users: sorry, right now it might not be performant enough to work well on a phone. on mine
+                    its fairly snappy with 2 or so items entered manually,
                     the system doesnt hang, but it seems to stop the algorithm if you spend too much time out of your
-                    browser, or in another tab
+                    browser, or in another tab during a longer search
                 </p>
                 <div class="progress">
                     <div id="prog" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"

@@ -838,6 +838,7 @@ var app = new Vue({
             enemy_armor = this.enemy_armor
             pwr_cap = this.pwr_cap
             ability = this.ability
+            use_acorns = this.use_acorns
 
             sort_criteria = function (a, b) {
                 if (this.random) {

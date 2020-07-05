@@ -518,8 +518,7 @@ items = [
         stats: {
             pwr: 50,
             speed: 7,
-            def: 30,
-            pen: 30
+            def: 30
         },
         passive: 'PASSIVE – Melee Basic Attacks decreases enemy Physical protections by 10, and increase your physical protection by 10 for 3s (max. 3 Stacks).',
         stat_calc: function (stats) {
@@ -769,6 +768,7 @@ var app = new Vue({
     el: "#app",
     data: {
         alert: false,
+        gen: false,
         rat_list: [],
         saved: [],
         charts: [],
@@ -777,7 +777,9 @@ var app = new Vue({
         random: false,
         use_acorns: true,
         lonos: true,
+        pwr_cap: 400,
         enemy_armor: 100,
+        ability: 66,
         percent: 0,
         number: 6,
         power: 5,
@@ -807,7 +809,10 @@ var app = new Vue({
             }
 
         },
-        search: function (event) {
+        search: async function (event) {
+            this.gen = true
+            app.$forceUpdate()
+            await this.$forceUpdate()
             console.log(this.preselect)
             preset_items = []
             this.preselect.forEach(element => {
@@ -831,6 +836,8 @@ var app = new Vue({
             util = this.util
             random = this.random
             enemy_armor = this.enemy_armor
+            pwr_cap = this.pwr_cap
+            ability = this.ability
 
             sort_criteria = function (a, b) {
                 if (this.random) {
@@ -847,28 +854,43 @@ var app = new Vue({
                 a_magic = (a_ehp.magic) * 0.00485
                 b_magic = (b_ehp.magic) * 0.00485
 
-                cap_power = Math.min(400, a.stats.pwr)
+                cap_power = Math.min(pwr_cap, a.stats.pwr)
                 cap_percent = Math.min(40, a.stats.pencent)
                 cap_pen = Math.min(50, a.stats.pen)
                 cap_crit = Math.min(100, a.stats.crit)
+                cap_cdr = Math.min(40, a.stats.cdr)
+                cap_ccr = Math.min(40, a.stats.ccr)
 
                 enemy_mit = (100 / (100 + Math.max(0, (this.enemy_armor * (1 - cap_percent * 0.01) - cap_pen))))
-                a_power = (cap_power / 4) + (cap_power / 4) * cap_crit * 0.01
+                a_power = (cap_power / 4)
+                a_power += ((cap_power / 4) * cap_crit * 0.01) * ((100 - ability) * 0.1)
+                a_power += ((cap_power / 4) * a.stats.atk * 0.01) * ((100 - ability) * 0.08)
+                a_power += ((cap_power / 4) * cap_cdr * 0.01) * ((ability) * 0.1)
                 a_power = a_power * enemy_mit
 
-                a.score = Math.round((a_phys * this.def + a_magic * this.mdf + a_power * this.power) / (1 + this.def + this.mdf + this.power))
+                a_util = (a.stats.vamp + a.stats.cdr + cap_ccr + a.stats.speed) / 3
+                a.score = Math.round((a_phys * this.def + a_magic * this.mdf + a_power * this.power + a_util * this.util) / (1 + this.def + this.mdf + this.power + this.util))
+
+
 
                 if (!b.score) {
 
-                    cap_power = Math.min(400, b.stats.pwr)
+                    cap_power = Math.min(pwr_cap, b.stats.pwr)
                     cap_percent = Math.min(40, b.stats.pencent)
                     cap_pen = Math.min(50, b.stats.pen)
                     cap_crit = Math.min(100, b.stats.crit)
+                    cap_cdr = Math.min(40, b.stats.cdr)
+                    cap_ccr = Math.min(40, b.stats.ccr)
 
                     enemy_mit = (100 / (100 + Math.max(0, (this.enemy_armor * (1 - cap_percent * 0.01) - cap_pen))))
-                    b_power = (cap_power / 4) + (cap_power / 4) * cap_crit * 0.01
-                    b_power = b_power * enemy_mit
-                    b.score = Math.round((b_phys * this.def + b_magic * this.mdf + b_power * this.power) / (1 + this.def + this.mdf + this.power))
+                    b_power = (cap_power / 4)
+                    b_power += ((cap_power / 4) * cap_crit * 0.01) * ((100 - ability) * 0.1)
+                    b_power += ((cap_power / 4) * b.stats.atk * 0.01) * ((100 - ability) * 0.08)
+                    b_power += ((cap_power / 4) * cap_cdr * 0.01) * ((ability) * 0.1)
+                    b_power = a_power * enemy_mit
+                    b_util = (b.stats.vamp + b.stats.cdr + cap_ccr + b.stats.speed) / 3
+
+                    b.score = Math.round((b_phys * this.def + b_magic * this.mdf + b_power * this.power + b_util * this.util) / (1 + this.def + this.mdf + this.power + this.util))
                 }
 
                 return (a.score - b.score)
@@ -992,7 +1014,7 @@ var app = new Vue({
                     series: [{
                         name: '',
                         color: '#F3969A',
-                        data: [r.stats.pwr, r.stats.def, r.stats.mdf, r.stats.crit, r.stats.vamp, r.stats.pen + r.stats.pencent]
+                        data: [r.stats.pwr, r.stats.def, r.stats.mdf, 3.5 * r.stats.crit, 3 * r.stats.vamp, 3 * (r.stats.pen + r.stats.pencent)]
                     }]
                 }
                 console.log(r.chart)
@@ -1000,6 +1022,7 @@ var app = new Vue({
             this.rat_list = rats
             not = new Notification('Rat builds loaded!')
             this.alert = true
+            this.gen = false
         }
     }
 })

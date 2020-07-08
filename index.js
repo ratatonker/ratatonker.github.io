@@ -137,7 +137,7 @@ items = [
     }, {
         name: 'Serrated Edge',
         stats: {
-            pwr: 40,
+            pwr: 30,
             pencent: 20,
             vamp: 10,
             speed: 10
@@ -676,7 +676,7 @@ items = [
     }, {
         name: 'Atalantas Bow',
         stats: {
-            pwr: 30,
+            pwr: 25,
             pencent: 20,
             atk: 30
         },
